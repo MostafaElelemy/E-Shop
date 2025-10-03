@@ -1,45 +1,77 @@
 import { $, formatUSD } from "./utils.js";
-import { entries, total } from "./storage.js";
-import { state } from "./storage.js";
+import {
+  entries,
+  total,
+  clearCart,
+  getFavoriteCount,
+  getCartItemCount,
+} from "./storage.js";
 
-function summary() {
-  const arr = entries();
-  const wrap = $("#summary");
-  if (!arr.length) {
-    wrap.innerHTML = '<div class="empty">Cart is empty.</div>';
+function updateBadgeCounts() {
+  const favBadge = $("#favCount");
+  const cartBadge = $("#cartCount");
+
+  if (favBadge) favBadge.textContent = getFavoriteCount() || "";
+  if (cartBadge) cartBadge.textContent = getCartItemCount() || "";
+}
+
+function renderSummary() {
+  const wrapper = $("#summary");
+  const items = entries();
+
+  if (!wrapper) return;
+
+  if (items.length === 0) {
+    wrapper.innerHTML = '<div class="empty">Cart is empty.</div>';
     return;
   }
-  wrap.innerHTML = `<table><thead><tr><th>Item</th><th>Qty</th><th>Subtotal</th></tr></thead>
-    <tbody>${arr
-      .map(
-        ({ product: p, qty }) =>
-          `<tr><td>${p.title}</td><td>${qty}</td><td>${formatUSD(
-            p.price * qty
-          )}</td></tr>`
-      )
-      .join("")}</tbody></table>
-    <p><strong>Total: ${formatUSD(total())}</strong></p>`;
+
+  let rowsHtml = "";
+  for (const { product, qty } of items) {
+    const subtotal = formatUSD(product.price * qty);
+    rowsHtml += `<tr><td>${product.title}</td><td>${qty}</td><td>${subtotal}</td></tr>`;
+  }
+
+  wrapper.innerHTML = `
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Qty</th><th>Subtotal</th></tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <p><strong>Total: ${formatUSD(total())}</strong></p>
+  `;
 }
 
-function badges() {
-  $("#favCount").textContent = Object.keys(state.fav).length || "";
-  const n = Object.values(state.cart).reduce((s, x) => s + (x.qty || 0), 0);
-  $("#cartCount").textContent = n || "";
-}
-badges();
+function handleSubmit(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const formData = new FormData(form);
 
-document.getElementById("checkoutForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const fd = new FormData(e.currentTarget);
-  const name = (fd.get("name") || "").trim();
-  const email = (fd.get("email") || "").trim();
-  const address = (fd.get("address") || "").trim();
-  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if (!name || !ok || address.length < 6) {
+  const name = (formData.get("name") || "").trim();
+  const email = (formData.get("email") || "").trim();
+  const address = (formData.get("address") || "").trim();
+
+  const nameIsValid = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/.test(name);
+  const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const addressIsValid = address.length >= 6;
+
+  if (!nameIsValid || !emailIsValid || !addressIsValid) {
     alert("Please enter a valid name, email, and address.");
     return;
   }
+
   alert("Order placed!");
-  localStorage.setItem("eshop_cart", "{}");
-  location.href = "index.html";
-});
+  clearCart();
+  updateBadgeCounts();
+  renderSummary();
+  window.location.href = "index.html";
+}
+
+updateBadgeCounts();
+renderSummary();
+
+const checkoutForm = $("#checkoutForm");
+if (checkoutForm) {
+  checkoutForm.addEventListener("submit", handleSubmit);
+}

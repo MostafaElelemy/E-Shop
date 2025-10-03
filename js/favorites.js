@@ -1,96 +1,117 @@
 import { $, formatUSD } from "./utils.js";
-import { state, toggleFav, addOnce } from "./storage.js";
+import {
+  state,
+  toggleFav,
+  addOnce,
+  getFavoriteCount,
+  getCartItemCount,
+} from "./storage.js";
 
-const proceedBtn = $("#favProceed");
+const proceedButton = $("#favProceed");
 let productCache = new Map();
 
-const favIds = () => Object.keys(state.fav).map(Number);
-const favProducts = () =>
-  favIds()
-    .map((id) => productCache.get(id))
-    .filter(Boolean);
+function getFavouriteIds() {
+  return Object.keys(state.fav).map(Number);
+}
 
-function updateProceedState(count) {
-  if (!proceedBtn) return;
+function getFavouriteProducts() {
+  const products = [];
+  for (const id of getFavouriteIds()) {
+    const product = productCache.get(id);
+    if (product) {
+      products.push(product);
+    }
+  }
+  return products;
+}
+
+function updateProceedButton(count) {
+  if (!proceedButton) return;
+
   if (count > 0) {
-    proceedBtn.disabled = false;
-    proceedBtn.textContent =
-      count === 1
-        ? "Move 1 favorite to cart"
-        : `Move ${count} favorites to cart`;
+    proceedButton.disabled = false;
+    proceedButton.textContent =
+      count === 1 ? "Move 1 favorite to cart" : `Move ${count} favorites to cart`;
   } else {
-    proceedBtn.disabled = true;
-    proceedBtn.textContent = "Move favorites to cart";
+    proceedButton.disabled = true;
+    proceedButton.textContent = "Move favorites to cart";
   }
 }
 
-function render(items) {
+function updateBadgeCounts() {
+  const favBadge = $("#favCount");
+  const cartBadge = $("#cartCount");
+
+  if (favBadge) favBadge.textContent = getFavoriteCount() || "";
+  if (cartBadge) cartBadge.textContent = getCartItemCount() || "";
+}
+
+function renderFavourites(products) {
   const grid = $("#grid");
+  if (!grid) return;
+
   grid.innerHTML = "";
-  updateProceedState(favIds().length);
-  if (!items.length) {
+  updateProceedButton(products.length);
+  updateBadgeCounts();
+
+  if (products.length === 0) {
     grid.innerHTML = '<div class="empty">No favorites yet.</div>';
     return;
   }
-  for (const p of items) {
-    const el = document.createElement("article");
-    el.className = "card";
-    el.innerHTML = `
-      <div class="img"><img src="${p.image || "assets/logo.png"}" alt=""></div>
+
+  for (const product of products) {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="img"><img src="${product.image || "assets/logo.png"}" alt=""></div>
       <div class="meta">
-        <div class="badge">${p.category}</div>
-        <div class="title">${p.title}</div>
-        <div class="price">${formatUSD(p.price)}</div>
+        <div class="badge">${product.category}</div>
+        <div class="title">${product.title}</div>
+        <div class="price">${formatUSD(product.price)}</div>
         <div class="actions">
           <button class="btn" data-remove>Remove</button>
-
         </div>
       </div>`;
-    el.querySelector("[data-remove]").addEventListener("click", () => {
-      toggleFav(p.id);
-      render(favProducts());
+
+    card.querySelector("[data-remove]").addEventListener("click", () => {
+      toggleFav(product.id);
+      renderFavourites(getFavouriteProducts());
     });
-    grid.appendChild(el);
+
+    grid.appendChild(card);
   }
 }
 
-function badges() {
-  $("#favCount").textContent = Object.keys(state.fav).length || "";
-  const n = Object.values(state.cart).reduce((s, x) => s + (x.qty || 0), 0);
-  $("#cartCount").textContent = n || "";
-}
-badges();
+if (proceedButton) {
+  proceedButton.addEventListener("click", () => {
+    const products = getFavouriteProducts();
+    if (!products.length) return;
 
-proceedBtn?.addEventListener("click", () => {
-  const items = favProducts();
-  if (!items.length) return;
-  items.forEach(addOnce);
-  window.location.href = "cart.html";
-});
-
-async function boot() {
-  if (!productCache.size) {
-    try {
-      const r = await fetch("https://fakestoreapi.com/products");
-      const data = await r.json();
-      productCache = new Map(
-        data.map((p) => [
-          p.id,
-          {
-            id: p.id,
-            title: p.title,
-            price: +p.price,
-            category: p.category,
-            image: p.image,
-          },
-        ])
-      );
-    } catch {
-      const r = await fetch("./assets/products.json");
-      const data = await r.json();
-      productCache = new Map(data.map((p) => [p.id, p]));
+    for (const product of products) {
+      addOnce(product);
     }
-  }
-  render(favProducts());
+
+    window.location.href = "cart.html";
+  });
 }
-boot();
+
+async function loadProducts() {
+  if (productCache.size) {
+    renderFavourites(getFavouriteProducts());
+    return;
+  }
+
+  try {
+    const response = await fetch("https://fakestoreapi.com/products");
+    const data = await response.json();
+    productCache = new Map(data.map((item) => [item.id, { ...item, price: Number(item.price) }]));
+  } catch (error) {
+    const response = await fetch("./assets/products.json");
+    const data = await response.json();
+    productCache = new Map(data.map((item) => [item.id, { ...item, price: Number(item.price) }]));
+  }
+
+  renderFavourites(getFavouriteProducts());
+}
+
+loadProducts();

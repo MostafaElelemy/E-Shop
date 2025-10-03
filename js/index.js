@@ -1,94 +1,146 @@
-import { $, $$, debounce, formatUSD } from "./utils.js";
+import { $, debounce, formatUSD } from "./utils.js";
 import {
   state,
   toggleFav,
   addOnce,
   inCart,
   removeFromCart,
+  getFavoriteCount,
+  getCartItemCount,
 } from "./storage.js";
 import { getProducts } from "./api.js";
 
-let all = [],
-  view = [];
+let allProducts = [];
+let filteredProducts = [];
 
-function badges() {
-  $("#favCount").textContent = Object.keys(state.fav).length || "";
-  const n = Object.values(state.cart).reduce((s, x) => s + (x.qty || 0), 0);
-  $("#cartCount").textContent = n || "";
+function updateBadgeCounts() {
+  const favBadge = $("#favCount");
+  const cartBadge = $("#cartCount");
+
+  if (favBadge) favBadge.textContent = getFavoriteCount() || "";
+  if (cartBadge) cartBadge.textContent = getCartItemCount() || "";
 }
 
-function card(p) {
-  const el = document.createElement("article");
-  el.className = "card";
-  const inCartState = inCart(p.id);
-  el.innerHTML = `
-    <div class="img"><img src="${p.image || "assets/logo.png"}" alt=""></div>
+function createProductCard(product) {
+  const card = document.createElement("article");
+  card.className = "card";
+  const isInCart = inCart(product.id);
+
+  card.innerHTML = `
+    <div class="img"><img src="${product.image || "assets/logo.png"}" alt=""></div>
     <div class="meta">
-      <div class="badge">${p.category}</div>
-      <div class="title">${p.title}</div>
-      <div class="price">${formatUSD(p.price)}</div>
+      <div class="badge">${product.category}</div>
+      <div class="title">${product.title}</div>
+      <div class="price">${formatUSD(product.price)}</div>
       <div class="actions">
-        <button class="btn" data-fav>${
-          state.fav[p.id] ? "★ Remove" : "☆ Favorite"
-        }</button>
-        <button class="btn primary" data-add>${
-          inCartState ? "Added" : "Add to cart"
-        }</button>
+        <button class="btn" data-fav>${state.fav[product.id] ? "★ Remove" : "☆ Favorite"}</button>
+        <button class="btn primary" data-add>${isInCart ? "Added" : "Add to cart"}</button>
       </div>
     </div>`;
-  el.querySelector("[data-fav]").addEventListener("click", () => {
-    toggleFav(p.id);
-    el.querySelector("[data-fav]").textContent = state.fav[p.id]
-      ? "★ Remove"
-      : "☆ Favorite";
-    badges();
+
+  const favButton = card.querySelector("[data-fav]");
+  favButton.addEventListener("click", () => {
+    toggleFav(product.id);
+    favButton.textContent = state.fav[product.id] ? "★ Remove" : "☆ Favorite";
+    updateBadgeCounts();
   });
-  const addBtn = el.querySelector("[data-add]");
-  addBtn.addEventListener("click", () => {
-    if (inCart(p.id)) {
-      removeFromCart(p.id);
-      addBtn.textContent = "Add to cart";
+
+  const addButton = card.querySelector("[data-add]");
+  addButton.addEventListener("click", () => {
+    if (inCart(product.id)) {
+      removeFromCart(product.id);
+      addButton.textContent = "Add to cart";
     } else {
-      addOnce(p);
-      addBtn.textContent = "Added";
+      addOnce(product);
+      addButton.textContent = "Added";
     }
-    badges();
+    updateBadgeCounts();
   });
-  return el;
+
+  return card;
 }
 
-function render() {
+function renderProducts() {
   const grid = $("#grid");
+  if (!grid) return;
+
   grid.innerHTML = "";
-  view.forEach((p) => grid.appendChild(card(p)));
-  $("#count").textContent = view.length ? `${view.length} items` : "No results";
-  badges();
-}
-
-function apply() {
-  const q = $("#search").value.trim().toLowerCase();
-  const cat = $("#category").value || "All";
-  view = all.filter(
-    (p) =>
-      (!q || p.title.toLowerCase().includes(q)) &&
-      (cat === "All" || p.category === cat)
-  );
-  render();
-}
-console.log("here");
-$("#search").addEventListener("input", debounce(apply, 200));
-$("#category").addEventListener("change", apply);
-
-(async function boot() {
-  try {
-    all = await getProducts();
-    const cats = ["All", ...new Set(all.map((p) => p.category))];
-    $("#category").innerHTML = cats
-      .map((c) => `<option value="${c}">${c}</option>`)
-      .join("");
-    apply();
-  } catch (e) {
-    $("#grid").innerHTML = '<div class="empty">Could not load products.</div>';
+  for (const product of filteredProducts) {
+    grid.appendChild(createProductCard(product));
   }
-  badges();
-})();
+
+  const count = $("#count");
+  if (count) {
+    count.textContent = filteredProducts.length
+      ? `${filteredProducts.length} items`
+      : "No results";
+  }
+
+  updateBadgeCounts();
+}
+
+function applyFilters() {
+  const searchValue = $("#search")?.value.trim().toLowerCase() || "";
+  const selectedCategory = $("#category")?.value || "All";
+
+  const result = [];
+  for (const product of allProducts) {
+    const matchesSearch =
+      !searchValue || product.title.toLowerCase().includes(searchValue);
+    const matchesCategory =
+      selectedCategory === "All" || product.category === selectedCategory;
+
+    if (matchesSearch && matchesCategory) {
+      result.push(product);
+    }
+  }
+
+  filteredProducts = result;
+  renderProducts();
+}
+
+function populateCategories(products) {
+  const select = $("#category");
+  if (!select) return;
+
+  const categories = new Set(["All"]);
+  for (const product of products) {
+    categories.add(product.category);
+  }
+
+  select.innerHTML = "";
+  for (const category of categories) {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    select.appendChild(option);
+  }
+}
+
+async function initialisePage() {
+  try {
+    allProducts = await getProducts();
+    filteredProducts = allProducts.slice();
+    populateCategories(allProducts);
+    renderProducts();
+  } catch (error) {
+    const grid = $("#grid");
+    if (grid) {
+      grid.innerHTML = '<div class="empty">Could not load products.</div>';
+    }
+  }
+
+  updateBadgeCounts();
+}
+
+const searchInput = $("#search");
+if (searchInput) {
+  searchInput.addEventListener("input", debounce(applyFilters, 200));
+}
+
+const categorySelect = $("#category");
+if (categorySelect) {
+  categorySelect.addEventListener("change", applyFilters);
+}
+
+initialisePage();

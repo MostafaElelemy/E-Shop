@@ -1,52 +1,78 @@
 import { $, formatUSD } from "./utils.js";
-import { state, setQty } from "./storage.js";
+import { state, setQty, getFavoriteCount, getCartItemCount } from "./storage.js";
 
-function badges() {
-  $("#favCount").textContent = Object.keys(state.fav).length || "";
-  const n = Object.values(state.cart).reduce((s, x) => s + (x.qty || 0), 0);
-  $("#cartCount").textContent = n || "";
+function updateBadgeCounts() {
+  const favBadge = $("#favCount");
+  const cartBadge = $("#cartCount");
+
+  if (favBadge) favBadge.textContent = getFavoriteCount() || "";
+  if (cartBadge) cartBadge.textContent = getCartItemCount() || "";
 }
-badges();
 
-function render() {
-  const wrap = $("#cartWrap");
-  const items = Object.values(state.cart);
-  if (!items.length) {
-    wrap.innerHTML = '<div class="empty">Your cart is empty.</div>';
-    return;
-  }
-  let total = 0;
-  const rows = items
-    .map(({ product: p, qty }) => {
-      const sub = p.price * qty;
-      total += sub;
-      return `
+function buildRow(item) {
+  const { product, qty } = item;
+  const imageSrc = product.image || "assets/logo.png";
+  const subtotal = product.price * qty;
+
+  return `
     <tr>
       <td style="display:flex;gap:8px;align-items:center">
-        <img src="${
-          p.image || "assets/logo.png"
-        }" alt="" style="width:42px;height:42px;object-fit:contain;border:1px solid var(--border);border-radius:8px;background:#0b1220;padding:4px"/>
-        <div><div class="title">${p.title}</div><div class="small">${
-        p.category
-      }</div></div>
+        <img src="${imageSrc}" alt="" style="width:42px;height:42px;object-fit:contain;border:1px solid var(--border);border-radius:8px;background:#0b1220;padding:4px" />
+        <div>
+          <div class="title">${product.title}</div>
+          <div class="small">${product.category}</div>
+        </div>
       </td>
-      <td>${formatUSD(p.price)}</td>
-      <td><input type="number" min="0" value="${qty}" data-qty="${
-        p.id
-      }" style="width:70px"></td>
-      <td>${formatUSD(sub)}</td>
-    </tr>`;
-    })
-    .join("");
-  wrap.innerHTML = `<table><thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th></tr></thead><tbody>${rows}</tbody></table>
-  <p><strong>Total: ${formatUSD(total)}</strong></p>`;
-  wrap.querySelectorAll("[data-qty]").forEach((inp) =>
-    inp.addEventListener("input", (e) => {
-      const id = +e.target.getAttribute("data-qty");
-      const v = Math.max(0, Math.floor(+e.target.value || 0));
-      setQty(id, v);
-      render();
-    })
-  );
+      <td>${formatUSD(product.price)}</td>
+      <td>
+        <input type="number" min="0" value="${qty}" data-qty="${product.id}" style="width:70px" />
+      </td>
+      <td>${formatUSD(subtotal)}</td>
+    </tr>
+  `;
 }
-render();
+
+function renderCart() {
+  const container = $("#cartWrap");
+  const items = Object.values(state.cart);
+
+  if (!container) return;
+
+  if (items.length === 0) {
+    container.innerHTML = '<div class="empty">Your cart is empty.</div>';
+    updateBadgeCounts();
+    return;
+  }
+
+  let rowsHtml = "";
+  let orderTotal = 0;
+
+  for (const item of items) {
+    rowsHtml += buildRow(item);
+    orderTotal += item.product.price * item.qty;
+  }
+
+  container.innerHTML = `
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th></tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <p><strong>Total: ${formatUSD(orderTotal)}</strong></p>
+  `;
+
+  container.querySelectorAll("[data-qty]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      const id = Number(event.currentTarget.dataset.qty);
+      const value = Number(event.currentTarget.value);
+      const safeValue = Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
+      setQty(id, safeValue);
+      renderCart();
+    });
+  });
+
+  updateBadgeCounts();
+}
+
+renderCart();

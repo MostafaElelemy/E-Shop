@@ -1,28 +1,32 @@
-// fetch with local fallback (keeps page working offline)
-async function remote() {
-  const r = await fetch("https://fakestoreapi.com/products");
-  if (!r.ok) throw new Error("net");
-  return r.json();
+async function fetchRemoteProducts() {
+  const response = await fetch("https://fakestoreapi.com/products");
+  if (!response.ok) {
+    throw new Error("Network error");
+  }
+  return response.json();
 }
+
+async function fetchLocalProducts() {
+  const response = await fetch("./assets/products.json");
+  return response.json();
+}
+
+function normaliseProduct(product) {
+  return {
+    id: product.id,
+    title: product.title,
+    price: Number(product.price),
+    category: product.category,
+    image: product.image,
+  };
+}
+
 export async function getProducts() {
   try {
-    const data = await remote();
-    return data.map((p) => ({
-      id: p.id,
-      title: p.title,
-      price: +p.price,
-      category: p.category,
-      image: p.image,
-    }));
-  } catch (e) {
-    const r = await fetch("./assets/products.json");
-    const data = await r.json();
-    return data.map((p) => ({
-      id: p.id,
-      title: p.title,
-      price: +p.price,
-      category: p.category,
-      image: p.image,
-    }));
+    const remoteProducts = await fetchRemoteProducts();
+    return remoteProducts.map(normaliseProduct);
+  } catch (err) {
+    const localProducts = await fetchLocalProducts();
+    return localProducts.map(normaliseProduct);
   }
 }

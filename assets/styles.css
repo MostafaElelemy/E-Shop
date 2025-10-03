@@ -7,25 +7,30 @@
   --primary: #60a5fa;
   --danger: #ef4444;
 }
+
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
   font: 16px/1.5 system-ui, Segoe UI, Roboto;
 }
+
 a {
   color: inherit;
   text-decoration: none;
 }
+
 header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
 }
+
 .nav {
   width: 100%;
   margin: 0;
@@ -36,23 +41,27 @@ header {
   align-items: flex-start;
   justify-content: center;
 }
+
 .brand {
   display: flex;
   gap: 8px;
   align-items: center;
   font-weight: 800;
 }
+
 .brand img {
   width: 24px;
   height: 24px;
   border-radius: 6px;
 }
+
 .tabs {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 8px;
   width: 100%;
 }
+
 .tabs a {
   display: block;
   padding: 10px 12px;
@@ -61,18 +70,21 @@ header {
   border-radius: 8px;
   background: #0b1220;
 }
+
 @media (min-width: 720px) {
   .nav {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
   }
+
   .tabs {
     display: flex;
     width: auto;
     flex-wrap: wrap;
     justify-content: flex-end;
   }
+
   .tabs a {
     display: inline-flex;
     align-items: center;
@@ -82,33 +94,39 @@ header {
     text-align: center;
   }
 }
+
 @media (min-width: 640px) {
   .nav {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
   }
+
   .tabs {
     display: flex;
     flex-wrap: wrap;
     width: auto;
   }
+
   .tabs a {
     padding: 6px 10px;
     min-height: auto;
   }
 }
+
 main {
   max-width: 1000px;
   margin: 0 auto;
   padding: 14px;
 }
+
 .controls {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 12px;
 }
+
 input,
 select,
 button,
@@ -119,18 +137,22 @@ textarea {
   border-radius: 8px;
   padding: 8px 10px;
 }
+
 button {
   cursor: pointer;
 }
+
 .btn.primary {
   background: var(--primary);
   color: #0b1220;
   border-color: transparent;
 }
+
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .cta-button {
   display: inline-block;
   margin-top: 16px;
@@ -141,25 +163,30 @@ button:disabled {
   font-weight: 600;
   text-align: center;
 }
+
 .cta-button:hover {
   background: #7cb3ff;
 }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
   gap: 10px;
   grid-auto-rows: 1fr;
 }
+
 @media (min-width: 640px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (min-width: 900px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
 .card {
   border: 5px solid var(--border);
   border-radius: 20px;
@@ -168,16 +195,19 @@ button:disabled {
   display: flex;
   flex-direction: column;
 }
+
 .card .img {
   height: 150px;
   width: 100%;
 }
+
 .card img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   padding: 10px;
 }
+
 .card .meta {
   padding: 10px;
   display: flex;
@@ -185,44 +215,54 @@ button:disabled {
   gap: 1px;
   flex: 1;
 }
+
 .badge {
   font-size: 12px;
   color: var(--muted);
 }
+
 .title {
   font-weight: 700;
 }
+
 .price {
   font-weight: 800;
 }
+
 .actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   margin-top: auto;
 }
+
 .empty {
   padding: 12px;
   color: var(--muted);
 }
+
 .actions {
   display: flex;
   gap: 8px;
 }
+
 .empty {
   padding: 12px;
   color: var(--muted);
 }
+
 .favorites-actions {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
 }
+
 table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 8px;
 }
+
 th,
 td {
   padding: 8px 10px;
@@ -230,35 +270,44 @@ td {
   border: 1px solid var(--border);
   text-align: left;
 }
+
 th:first-child,
 td:first-child {
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
 }
+
 th:last-child,
 td:last-child {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
 }
+
 .small {
   font-size: 13px;
   color: var(--muted);
+  padding-left: 3px;
+  padding-top: 4px;
 }
+
 .hero {
   padding: clamp(48px, 8vw, 96px) clamp(16px, 6vw, 72px);
   background: linear-gradient(135deg, #111827, #0b1220);
 }
+
 .hero-content {
   display: grid;
   gap: clamp(32px, 6vw, 64px);
   justify-items: center;
   text-align: center;
 }
+
 .hero-text {
   max-width: min(560px, 100%);
   display: grid;
   gap: 20px;
 }
+
 .hero-text h1 {
   font-size: clamp(1.4rem, 5vw, 3rem);
   margin: 0;
@@ -267,12 +316,14 @@ td:last-child {
   line-height: 1.15;
   white-space: nowrap;
 }
+
 .hero-text p {
   font-size: clamp(1.05rem, 3vw, 1.25rem);
   margin: 0;
   line-height: 1.7;
   color: #fdfdfd;
 }
+
 .btn_main {
   display: inline-flex;
   align-items: center;
@@ -287,20 +338,73 @@ td:last-child {
   transition: transform 0.25s ease, background 0.25s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
+
 .btn_main:hover {
   background: #e65c00;
   transform: translateY(-2px);
 }
+
 .hero-image {
   width: 100%;
   display: flex;
   justify-content: center;
 }
+
 .hero-image img {
   width: min(420px, 100%);
   border-radius: 16px;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
 }
+
+.checkout-grid {
+  display: grid;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.checkout-form {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  width: 100%;
+  max-width: 520px;
+}
+
+.checkout-form .field {
+  display: grid;
+  gap: 6px;
+}
+
+.checkout-form label {
+  font-weight: 600;
+}
+
+.checkout-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.checkout-form .btn {
+  margin-top: 8px;
+  justify-self: stretch;
+}
+
+.order-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.summary-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 20px;
+  min-height: 200px;
+}
+
 @media (min-width: 900px) {
   .hero-content {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -308,64 +412,27 @@ td:last-child {
     text-align: left;
     justify-items: start;
   }
+
   .hero-text {
     justify-items: start;
   }
+
   .hero-image {
     justify-content: flex-end;
   }
 
   .checkout-grid {
-    display: grid;
-    gap: 24px;
-    margin-top: 20px;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.1fr);
   }
+
   .checkout-form {
-    display: grid;
-    gap: 16px;
-    padding: 24px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: var(--surface);
-    max-width: 520px;
+    max-width: none;
   }
-  .checkout-form .field {
-    display: grid;
-    gap: 6px;
-  }
-  .checkout-form label {
-    font-weight: 600;
-  }
-  .checkout-form textarea {
-    resize: vertical;
-    min-height: 120px;
-  }
-  .checkout-form .btn {
-    margin-top: 8px;
-    justify-self: stretch;
-  }
+
   .order-summary {
-    display: grid;
-    gap: 12px;
+    align-self: start;
   }
-  .summary-card {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: var(--surface);
-    padding: 20px;
-    min-height: 200px;
-  }
-  @media (min-width: 900px) {
-    .checkout-grid {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1.1fr);
-    }
-    .checkout-form {
-      max-width: none;
-    }
-    .order-summary {
-      align-self: start;
-    }
-  }
+
   .Welcome {
     max-width: 100%;
     margin: 0;
