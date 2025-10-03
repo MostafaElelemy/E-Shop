@@ -1,4 +1,4 @@
-// state in localStorage (very simple)
+
 const read = (k, f) => {
   try {
     const v = localStorage.getItem(k);
