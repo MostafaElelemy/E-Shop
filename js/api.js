@@ -1,4 +1,4 @@
-// fetch with local fallback (keeps page working offline)
+
 async function remote() {
   const r = await fetch("https://fakestoreapi.com/products");
   if (!r.ok) throw new Error("net");
