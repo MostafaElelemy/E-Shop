@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>E‑Shop — Favorites</title>
+    <link rel="icon" href="assets/logo.png" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="nav">
+        <a class="brand" href="landing.html"
+          ><img src="assets/logo.png" alt="Tefa logo" /> E‑Shop</a
+        >
+        <nav class="tabs">
+          <a href="index.html">Products</a>
+          <a href="favorites.html"
+            >Favorites <span id="favCount" class="small"></span
+          ></a>
+          <a href="cart.html"
+            >Cart <span id="cartCount" class="small"></span
+          ></a>
+          <a href="checkout.html">Checkout</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <h2>Favorites</h2>
+      <div id="grid" class="grid"></div>
+      <div class="favorites-actions">
+        <button id="favProceed" class="btn primary" type="button" disabled>
+          Move favorites to cart
+        </button>
+      </div>
+    </main>
+    <script type="module" src="js/favorites.js"></script>
+  </body>
+</html>
