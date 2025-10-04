@@ -11,22 +11,12 @@ async function fetchLocalProducts() {
   return response.json();
 }
 
-function normaliseProduct(product) {
-  return {
-    id: product.id,
-    title: product.title,
-    price: Number(product.price),
-    category: product.category,
-    image: product.image,
-  };
-}
-
 export async function getProducts() {
   try {
     const remoteProducts = await fetchRemoteProducts();
-    return remoteProducts.map(normaliseProduct);
+    return remoteProducts;
   } catch (err) {
     const localProducts = await fetchLocalProducts();
-    return localProducts.map(normaliseProduct);
+    return localProducts;
   }
 }
