@@ -52,7 +52,7 @@ function handleSubmit(event) {
   const email = (formData.get("email") || "").trim();
   const address = (formData.get("address") || "").trim();
 
-  const nameIsValid = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/.test(name);
+  const nameIsValid = /^[A-Za-z ]+$/.test(name);
   const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const addressIsValid = address.length >= 6;
 

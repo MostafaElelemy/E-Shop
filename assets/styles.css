@@ -1,13 +1,36 @@
 :root {
-  --bg: #0f172a;
-  --surface: #111827;
-  --fg: #e5e7eb;
-  --muted: #9ca3af;
-  --border: #1f2937;
-  --primary: #60a5fa;
-  --danger: #ef4444;
+  color-scheme: light;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-alt: #f1f5f9;
+  --fg: #0f172a;
+  --muted: #475569;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --primary-contrast: #ffffff;
+  --danger: #dc2626;
+  --hero-gradient-start: #e0f2fe;
+  --hero-gradient-end: #bfdbfe;
+  --shadow-color: rgba(15, 23, 42, 0.12);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0f172a;
+    --surface: #111827;
+    --surface-alt: #0b1220;
+    --fg: #e5e7eb;
+    --muted: #9ca3af;
+    --border: #1f2937;
+    --primary: #60a5fa;
+    --primary-contrast: #0b1220;
+    --danger: #ef4444;
+    --hero-gradient-start: #111827;
+    --hero-gradient-end: #0b1220;
+    --shadow-color: rgba(0, 0, 0, 0.28);
+  }
+}
 * {
   box-sizing: border-box;
 }
@@ -16,7 +39,6 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
-  font: 16px/1.5 system-ui, Segoe UI, Roboto;
 }
 
 a {
@@ -68,7 +90,7 @@ header {
   text-align: center;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #0b1220;
+  background: var(--surface-alt);
 }
 
 @media (min-width: 720px) {
@@ -132,7 +154,7 @@ select,
 button,
 textarea {
   border: 1px solid var(--border);
-  background: #0b1220;
+  background: var(--surface-alt);
   color: var(--fg);
   border-radius: 8px;
   padding: 8px 10px;
@@ -144,7 +166,7 @@ button {
 
 .btn.primary {
   background: var(--primary);
-  color: #0b1220;
+  color: var(--primary-contrast);
   border-color: transparent;
 }
 
@@ -159,13 +181,14 @@ button:disabled {
   padding: 12px 20px;
   border-radius: 10px;
   background: var(--primary);
-  color: #0b1220;
+  color: var(--primary-contrast);
   font-weight: 600;
   text-align: center;
+  transition: background 0.2s ease;
 }
 
 .cta-button:hover {
-  background: #7cb3ff;
+  background: color-mix(in srgb, var(--primary) 85%, #ffffff 15%);
 }
 
 .grid {
@@ -292,7 +315,11 @@ td:last-child {
 
 .hero {
   padding: clamp(48px, 8vw, 96px) clamp(16px, 6vw, 72px);
-  background: linear-gradient(135deg, #111827, #0b1220);
+  background: linear-gradient(
+    135deg,
+    var(--hero-gradient-start),
+    var(--hero-gradient-end)
+  );
 }
 
 .hero-content {
@@ -321,7 +348,7 @@ td:last-child {
   font-size: clamp(1.05rem, 3vw, 1.25rem);
   margin: 0;
   line-height: 1.7;
-  color: #fdfdfd;
+  color: var(--fg);
 }
 
 .btn_main {
@@ -353,7 +380,7 @@ td:last-child {
 .hero-image img {
   width: min(420px, 100%);
   border-radius: 16px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 8px 22px var(--shadow-color);
 }
 
 .checkout-grid {
