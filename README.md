@@ -12,19 +12,6 @@ E-Shop is a lightweight storefront demo built with static HTML, CSS, and vanilla
 - Modular ES6 JavaScript located in `/js` for data fetching, storage, and UI interactions
 - Single stylesheet (`assets/styles.css`) featuring CSS Grid/Flexbox layouts and theme variables
 
-## Getting Started
-1. **Install dependencies (optional).** The project does not require a build step. To run a quick development server you can use any static file host such as `serve` or `http-server`.
-   ```bash
-   npm install --global serve
-   ```
-2. **Start a local server** from the repository root:
-   ```bash
-   serve .
-   ```
-   The site will be available at the URL that `serve` prints (e.g. `http://localhost:3000`).
-3. **Open the desired page** in your browser (`index.html` is the main storefront view).
-
-> 💡 You can also double-click any of the HTML files to open them directly in a browser. A local server is recommended so that API requests to `https://fakestoreapi.com/products` are not blocked by CORS policies.
 
 ## Pages
 | Page | File | Description |
