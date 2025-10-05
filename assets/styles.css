@@ -79,7 +79,6 @@ header {
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 8px;
   width: 100%;
 }
@@ -213,7 +212,6 @@ button:disabled {
 .card {
   border: 5px solid var(--border);
   border-radius: 20px;
-  overflow: hidden;
   background: var(--surface);
   display: flex;
   flex-direction: column;

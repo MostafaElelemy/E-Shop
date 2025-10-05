@@ -27,14 +27,20 @@ function createProductCard(product) {
   const isInCart = inCart(product.id);
 
   card.innerHTML = `
-    <div class="img"><img src="${product.image || "assets/logo.png"}" alt=""></div>
+    <div class="img"><img src="${
+      product.image || "assets/logo.png"
+    }" alt=""></div>
     <div class="meta">
       <div class="badge">${product.category}</div>
       <div class="title">${product.title}</div>
       <div class="price">${formatUSD(product.price)}</div>
       <div class="actions">
-        <button class="btn" data-fav>${state.fav[product.id] ? "★ Remove" : "☆ Favorite"}</button>
-        <button class="btn primary" data-add>${isInCart ? "Added" : "Add to cart"}</button>
+        <button class="btn" data-fav>${
+          state.fav[product.id] ? "★ Remove" : "☆ Favorite"
+        }</button>
+        <button class="btn primary" data-add>${
+          isInCart ? "Added" : "Add to cart"
+        }</button>
       </div>
     </div>`;
 
@@ -79,7 +85,7 @@ function renderProducts() {
   updateBadgeCounts();
 }
 
-function applyFilters() {
+function applyFiltersSearchs() {
   const searchValue = $("#search")?.value.trim().toLowerCase() || "";
   const selectedCategory = $("#category")?.value || "All";
 
@@ -108,7 +114,7 @@ function populateCategories(products) {
     categories.add(product.category);
   }
 
-  select.innerHTML = "";
+  // select.innerHTML = "";
   for (const category of categories) {
     const option = document.createElement("option");
     option.value = category;
@@ -135,12 +141,12 @@ async function initialisePage() {
 
 const searchInput = $("#search");
 if (searchInput) {
-  searchInput.addEventListener("input", debounce(applyFilters, 200));
+  searchInput.addEventListener("input", debounce(applyFiltersSearchs, 300));
 }
 
 const categorySelect = $("#category");
 if (categorySelect) {
-  categorySelect.addEventListener("change", applyFilters);
+  categorySelect.addEventListener("change", applyFiltersSearchs);
 }
 
 initialisePage();
